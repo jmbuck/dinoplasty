@@ -1,9 +1,10 @@
 const app = {
-    init(formSelector) {
+    init(selectors) {
         document
-            .querySelector(formSelector)
+            .querySelector(selectors.formSelector)
             .addEventListener('submit', this.addDino.bind(this));
         this.max = 0;
+        this.list = document.querySelector(selectors.listSelector);
     
     },
 
@@ -15,10 +16,21 @@ const app = {
             id: this.max+1,
         };
 
+        this.list.appendChild(this.renderListItem(dino)); 
+
         console.log(dino.name, dino.id);
         ++this.max;
     },
 
+    renderListItem(dino) {
+        const item = document.createElement('li');
+        item.textContent = dino.name;
+        return item;
+    },
+
 };
 
-app.init('#dino-form');
+app.init({
+    formSelector: '#dino-form',
+    listSelector: '#dino-list',
+});
