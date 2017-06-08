@@ -4,6 +4,7 @@ const app = {
         document
             .querySelector(selectors.formSelector)
             .addEventListener('submit', this.addDino.bind(this));
+        document.querySelector('#dino-name').focus();
         this.max = 0;
         this.list = document.querySelector(selectors.listSelector);
         this.dinos = [];

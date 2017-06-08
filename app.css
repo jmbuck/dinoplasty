@@ -64,3 +64,17 @@ i {
      transition-duration: 0.4s;
 }
 
+input[type=text] {
+    background: transparent;
+    border: 1px solid #403B50;
+    box-shadow: none;
+    transition-duration: 0.4s;
+}
+
+input[type=text]:focus,
+input[type=text]:hover {
+    background: transparent;
+    border: 1px solid #EDCB96;
+    box-shadow: none;
+}
+
