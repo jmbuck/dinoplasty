@@ -13,7 +13,9 @@ const app = {
     load() {
         this.names = localStorage.getItem('names');
         this.likes = localStorage.getItem('likes');
-        //If localStorage has data (isn't null), parse it and update list and data array
+       
+        //If localStorage has data (isn't null), parse it and update list and data array,
+        //Reassign IDs so they remain unique
         if(this.names != null) {
             let namesArr = this.names.split('&');
             let likesArr = this.likes.split('&');
@@ -24,6 +26,11 @@ const app = {
                             liked: likesArr[i]};
                 this.dinos.push(dino);
                 this.list.insertBefore(this.renderListItem(dino), this.list.firstChild);
+                const icon = document.querySelector(`#like${dino.id}>i`);
+
+                if(dino.liked == 'true') {
+                    icon.textContent = 'favorite';
+                } 
                 this.addEventListeners(dino.id);
             }
         } else {
@@ -50,37 +57,48 @@ const app = {
             <div class="input-group">
                 <div class="input-group-field">${dino.name}</div>
                 <div class="input-group-button">
-                    <button type="button" id="${'like'+dino.id}" class="button">${dino.liked == 'true' ? 'Unlike' : 'Like'}</button>
+                    <div id="${'like'+dino.id}" class="likes">
+                        <i class="material-icons" style="font-size: 36px">favorite_border</i>
+                    </div>
                 </div>
                 <div class="input-group-button">
-                    <button type="button" id="${'del'+dino.id}" class="button">Delete</button>
+                    <div id="${'del'+dino.id}" class="delete">
+                        <i class="material-icons" style="font-size: 36px">delete</i>
+                    </div>
                 </div>
                 <div class="input-group-button">
-                    <button type="button" id="${'up'+dino.id}" class="button">Up</button>
+                    <div id="${'up'+dino.id}" class="up">
+                        <i class="material-icons" style="font-size: 36px">keyboard_arrow_up</i>
+                    </div>
                 </div>  
                 <div class="input-group-button">
-                    <button type="button" id="${'down'+dino.id}" class="button">Down</button>
+                      <div id="${'down'+dino.id}" class="down">
+                        <i class="material-icons" style="font-size: 36px">keyboard_arrow_down</i>
+                    </div>
                 </div>
             </div>
         `;
+        /*
+             <button type="button" id="${'like'+dino.id}" class="button">${dino.liked == 'true' ? 'Unlike' : 'Like'}</button>
+              <button type="button" id="${'del'+dino.id}" class="button">Delete</button>
+        */
         item.id = 'item'+dino.id;
         if(dino.liked == 'true') {
-            item.style.backgroundColor = '#F0F3BD';
+            item.style.backgroundColor = '#EDCB96';
         }
-
         return item;
     },
 
     addEventListeners(id) {
-        document.querySelector('#like'+id).addEventListener('click', this.like.bind(this));
-        document.querySelector('#del'+id).addEventListener('click', this.delete.bind(this));
-        document.querySelector('#up'+id).addEventListener('click', this.moveUp.bind(this));
-        document.querySelector('#down'+id).addEventListener('click', this.moveDown.bind(this));
+        document.querySelector('#like'+id+'>i').addEventListener('click', this.like.bind(this));
+        document.querySelector('#del'+id+'>i').addEventListener('click', this.delete.bind(this));
+        document.querySelector('#up'+id+'>i').addEventListener('click', this.moveUp.bind(this));
+        document.querySelector('#down'+id+'>i').addEventListener('click', this.moveDown.bind(this));
     },
 
     like(event) {
-        const button = event.target;
-        const listItem = document.querySelector(`#${button.id.replace('like','item')}`);
+        const icon = event.target;
+        const listItem = document.querySelector(`#${icon.parentElement.id.replace('like','item')}`);
         let dino;
         //Find dino in array
         for(let i = 0; i < this.dinos.length; i++) {
@@ -90,20 +108,21 @@ const app = {
             }
         }
         //Toggles button text and background color
-        if(button.textContent == 'Like') {
-            listItem.style.backgroundColor = '#F0F3BD';
-            button.textContent = 'Unlike';
+        if(icon.innerHTML == 'favorite_border') {
+            listItem.style.backgroundColor = '#EDCB96';
+            icon.textContent = 'favorite'
             dino.liked = true;
         } else {
-            listItem.style.backgroundColor = 'white';
-            button.textContent = 'Like';
+            listItem.style.backgroundColor = '#9E7682';
+            icon.textContent = 'favorite_border'
             dino.liked = false;
         }
         this.updateStorage();
     },
 
     delete(event) {
-        const listItem = document.querySelector(`#${event.target.id.replace('del','item')}`);
+        const icon = event.target;
+        const listItem = document.querySelector(`#${icon.parentElement.id.replace('del','item')}`);
         //Searches the dinos array for id matching id # at end of listItem's id
         for(let i = 0; i < this.dinos.length; i++) {
             if(this.dinos[i].id == listItem.id.substr(4)) {
@@ -114,8 +133,8 @@ const app = {
         }
     },
 
-    moveUp(event) {
-        const listItem = document.querySelector(`#${event.target.id.replace('up','item')}`);
+    moveUp(event) {      
+        const listItem = document.querySelector(`#${event.target.parentElement.id.replace('up','item')}`);
         //Searches the dinos array for id matching id # at end of listItem's id
         //and swaps the element with the next in the array (up in the list)
         for(let i = 0; i < this.dinos.length; i++) {
@@ -133,7 +152,7 @@ const app = {
     },
 
     moveDown(event) {
-        const listItem = document.querySelector(`#${event.target.id.replace('down','item')}`);
+        const listItem = document.querySelector(`#${event.target.parentElement.id.replace('down','item')}`);
         //Searches the dinos array for id matching id # at end of listItem's id
         //and swaps the element with the previous in the array (down in the list)
         for(let i = 0; i < this.dinos.length; i++) {

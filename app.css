@@ -1,3 +1,7 @@
+body {
+    background-color: #9E7682;
+}
+
 h1 {
     text-align: center;
 }
@@ -23,4 +27,18 @@ li {
     margin-bottom: 0;
     height: 100%;
 
+}
+
+.likes,
+.delete,
+.up,
+.down {
+    height: 100%;
+    text-align: center;
+    width: 50px;
+    line-height: 100%;
+}
+
+i {
+     color: '#605770';
 }
