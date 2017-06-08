@@ -28,33 +28,69 @@ const app = {
                 </div>
             </div>
         `;
+        item.id = 'item'+dino.id;
 
         return item;
     },
 
     addEventListeners() {
-        for(let i = 0; i < max; i++) {
-            document.querySelector('#like'+id).addEventListener('click', this.like.bind(this));
-            document.querySelector('#del'+id).addEventListener('click', this.delete.bind(this));
-            document.querySelector('#up'+id).addEventListener('click', this.moveUp.bind(this));
-            document.querySelector('#down'+id).addEventListener('click', this.moveDown.bind(this));
-        }
+        document.querySelector('#like'+this.max).addEventListener('click', this.like.bind(this));
+        document.querySelector('#del'+this.max).addEventListener('click', this.delete.bind(this));
+        document.querySelector('#up'+this.max).addEventListener('click', this.moveUp.bind(this));
+        document.querySelector('#down'+this.max).addEventListener('click', this.moveDown.bind(this));
     },
 
     like(event) {
-
+        const button = event.target;
+        const listItem = document.querySelector(`#${button.id.replace('like','item')}`);
+        console.log(button.textContent);
+        if(button.textContent == 'Like') {
+            listItem.backgroundColor = '#F0F3BD';
+            button.textContent = 'Unlike';
+        } else {
+            listItem.backgroundColor = 'white';
+            button.textContent = 'Like';
+        }
     },
 
     delete(event) {
-
+        const listItem = document.querySelector(`#${event.target.id.replace('del','item')}`);
+        for(let i = 0; i < this.dinos.length; i++) {
+            if(this.dinos[i].id == listItem.id.substr(4)) {
+                this.dinos.splice(i, 1);
+            }
+        }
+        listItem.parentElement.removeChild(listItem);
     },
 
     moveUp(event) {
-
+        const listItem = document.querySelector(`#${event.target.id.replace('up','item')}`);
+        for(let i = 0; i < this.dinos.length; i++) {
+            if(this.dinos[i].id == listItem.id.substr(4)) {
+                if(i < this.dinos.length-1) {
+                    let temp = this.dinos[i];
+                    this.dinos[i] = this.dinos[i+1];
+                    this.dinos[i+1] = temp;
+                    listItem.parentNode.insertBefore(listItem, listItem.previousSibling);
+                }
+                break;
+            }
+        }
     },
 
     moveDown(event) {
-
+        const listItem = document.querySelector(`#${event.target.id.replace('down','item')}`);
+        for(let i = 0; i < this.dinos.length; i++) {
+            if(this.dinos[i].id == listItem.id.substr(4)) {
+                if(i > 0) {
+                    let temp = this.dinos[i];
+                    this.dinos[i] = this.dinos[i-1];
+                    this.dinos[i-1] = temp;
+                    listItem.parentNode.insertBefore(listItem.nextSibling, listItem);
+                }
+                break;
+            }
+        }
     },
 
     addDino(event) {
