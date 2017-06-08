@@ -45,6 +45,7 @@ li:hover {
     text-align: center;
     width: 50px;
     line-height: 100%;
+    cursor: pointer;
 }
 
 .likes>i:hover {

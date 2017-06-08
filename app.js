@@ -79,10 +79,7 @@ const app = {
                 </div>
             </div>
         `;
-        /*
-             <button type="button" id="${'like'+dino.id}" class="button">${dino.liked == 'true' ? 'Unlike' : 'Like'}</button>
-              <button type="button" id="${'del'+dino.id}" class="button">Delete</button>
-        */
+
         item.id = 'item'+dino.id;
         if(dino.liked == 'true') {
             item.style.backgroundColor = '#EDCB96';
