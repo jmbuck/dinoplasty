@@ -90,10 +90,16 @@ const app = {
     },
 
     addEventListeners(id) {
-        document.querySelector('#like'+id+'>i').addEventListener('click', this.like.bind(this));
-        document.querySelector('#del'+id+'>i').addEventListener('click', this.delete.bind(this));
-        document.querySelector('#up'+id+'>i').addEventListener('click', this.moveUp.bind(this));
-        document.querySelector('#down'+id+'>i').addEventListener('click', this.moveDown.bind(this));
+        document.querySelector('#like'+id).addEventListener('click', this.like.bind(this));
+        document.querySelector('#del'+id).addEventListener('click', this.delete.bind(this));
+        document.querySelector('#up'+id).addEventListener('click', this.moveUp.bind(this));
+        document.querySelector('#down'+id).addEventListener('click', this.moveDown.bind(this));
+        document.querySelector('#del'+id).addEventListener('mouseover', function(event) {
+            event.target.innerHTML = 'delete_forever';
+        } );
+        document.querySelector('#del'+id).addEventListener('mouseout', function(event) {
+            event.target.innerHTML = 'delete';
+        });
     },
 
     like(event) {
