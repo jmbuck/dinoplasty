@@ -1,116 +1,101 @@
 const app = {
     init(selectors) {
-        
         document
             .querySelector(selectors.formSelector)
-            .addEventListener('submit', this.addDino.bind(this));
-        document.querySelector('#dino-name').focus();
+            .addEventListener('submit', this.handleSubmit.bind(this));
         this.max = 0;
         this.list = document.querySelector(selectors.listSelector);
-        this.dinos = [];
         this.load();
     },
 
-    load() {
-        this.names = localStorage.getItem('names');
-        this.likes = localStorage.getItem('likes');
-       
+    load() {       
         //If localStorage has data (isn't null), parse it and update list and data array,
         //Reassign IDs so they remain unique
-        if(this.names != null) {
-            let namesArr = this.names.split('&');
-            let likesArr = this.likes.split('&');
-            this.max = namesArr.length-1;
-            for(let i = 0; i < namesArr.length-1; i++) {
-                const dino = {name: namesArr[i],
-                            id: i,
-                            liked: likesArr[i]};
-                this.dinos.push(dino);
-                this.list.insertBefore(this.renderListItem(dino), this.list.firstChild);
-                const icon = document.querySelector(`#like${dino.id}>i`);
-
-                if(dino.liked === 'true') {
+        this.dinos = JSON.parse(localStorage.getItem('dinos'));
+        if(this.dinos) {
+            this.dinos.map((dino) => {
+                dino.id = this.max;
+                this.addDino(dino)
+                const icon = document.querySelector(`[data-id="${dino.id}"] .like>i`)
+                if(dino.liked === true) {
                     icon.textContent = 'favorite';
-                } 
-                this.addEventListeners(dino.id);
-            }
-        } else {
-            this.names = '';
-            this.likes = '';
+                }
+            })
+        }
+        else {
+             this.dinos = [];
         }
     },
 
-    updateStorage() {
-        this.names = '';
-        this.likes = '';
-        for(let i = 0; i < this.dinos.length; i++) {
-            this.names += `${this.dinos[i].name}&`;
-            this.likes += `${this.dinos[i].liked}&`;
-        }
-        localStorage.setItem('names', this.names);
-        localStorage.setItem('likes', this.likes);
+    save() {
+        localStorage.setItem('dinos', JSON.stringify(this.dinos))
     },
 
-    renderListItem(dino) {
+    createListItem(dino) {
         //Creates list item with unique IDs for each button
-        const item = document.createElement('li');
-        item.innerHTML =`
+        const listItem = document.createElement('li');
+        listItem.innerHTML =`
             <div class="input-group">
                 <div class="input-group-field">${dino.name}</div>
                 <div class="input-group-button">
-                    <div id="${'like'+dino.id}" class="likes">
+                    <div class="like">
                         <i class="material-icons" style="font-size: 36px">favorite_border</i>
                     </div>
                 </div>
                 <div class="input-group-button">
-                    <div id="${'del'+dino.id}" class="delete">
+                    <div class="delete">
                         <i class="material-icons" style="font-size: 36px">delete</i>
                     </div>
                 </div>
                 <div class="input-group-button">
-                    <div id="${'up'+dino.id}" class="up">
+                    <div class="up">
                         <i class="material-icons" style="font-size: 36px">keyboard_arrow_up</i>
                     </div>
                 </div>  
                 <div class="input-group-button">
-                      <div id="${'down'+dino.id}" class="down">
+                      <div class="down">
                         <i class="material-icons" style="font-size: 36px">keyboard_arrow_down</i>
                     </div>
                 </div>
             </div>
         `;
 
-        item.id = 'item'+dino.id;
-        if(dino.liked === 'true') {
-            item.style.backgroundColor = '#EDCB96';
+        this.addEventListeners(listItem);
+        listItem.dataset.id = dino.id;
+        if(dino.liked === true) {
+            listItem.style.backgroundColor = '#EDCB96';
         }
-        return item;
+        return listItem;
     },
 
-    addEventListeners(id) {
-        document.querySelector('#like'+id).addEventListener('click', this.like.bind(this));
-        document.querySelector('#del'+id).addEventListener('click', this.delete.bind(this));
-        document.querySelector('#up'+id).addEventListener('click', this.moveUp.bind(this));
-        document.querySelector('#down'+id).addEventListener('click', this.moveDown.bind(this));
-        document.querySelector('#del'+id).addEventListener('mouseover', function(event) {
+    addEventListeners(listItem) {
+        //click events
+        listItem.querySelector('.like').addEventListener('click', this.like.bind(this));
+        listItem.querySelector('.delete').addEventListener('click', this.delete.bind(this));
+        listItem.querySelector('.up').addEventListener('click', this.moveUp.bind(this));
+        listItem.querySelector('.down').addEventListener('click', this.moveDown.bind(this));
+        
+        //hover events on delete
+        listItem.querySelector('.delete').addEventListener('mouseover', function(event) {
             event.target.innerHTML = 'delete_forever';
         } );
-        document.querySelector('#del'+id).addEventListener('mouseout', function(event) {
+        listItem.querySelector('.delete').addEventListener('mouseout', function(event) {
             event.target.innerHTML = 'delete';
         });
     },
 
     like(event) {
         const icon = event.target;
-        const listItem = document.querySelector(`#${icon.parentElement.id.replace('like','item')}`);
+        const listItem = icon.closest('li');
         let dino;
-        //Find dino in array
+        //Searches the dinos array for id matching listItem id
         for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id === parseInt(listItem.id.substr(4))) {
+            if(this.dinos[i].id === parseInt(listItem.dataset.id)) {
                 dino = this.dinos[i];
                 break;
             }
         }
+
         //Toggles button text and background color
         if(icon.innerHTML === 'favorite_border') {
             listItem.style.backgroundColor = '#EDCB96';
@@ -121,59 +106,61 @@ const app = {
             icon.textContent = 'favorite_border'
             dino.liked = false;
         }
-        this.updateStorage();
+        this.save();
     },
 
     delete(event) {
         const icon = event.target;
-        const listItem = document.querySelector(`#${icon.parentElement.id.replace('del','item')}`);
-        //Searches the dinos array for id matching id # at end of listItem's id
+        const listItem = icon.closest('li');
+        //Searches the dinos array for id matching listItem id
         for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id === parseInt(listItem.id.substr(4))) {
+            if(this.dinos[i].id === parseInt(listItem.dataset.id)) {
                 this.dinos.splice(i, 1);
-                this.updateStorage();
+                this.save();
                 listItem.remove();
+                break;
             }
         }
     },
 
     moveUp(event) {      
-        const listItem = document.querySelector(`#${event.target.parentElement.id.replace('up','item')}`);
-        //Searches the dinos array for id matching id # at end of listItem's id
+        const listItem = event.target.closest('li');
+        //Searches the dinos array for id matching listItem id
         //and swaps the element with the next in the array (up in the list)
         for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id === parseInt(listItem.id.substr(4))) {
+            if(this.dinos[i].id === parseInt(listItem.dataset.id)) {
                 if(i < this.dinos.length-1) {
                     let temp = this.dinos[i];
                     this.dinos[i] = this.dinos[i+1];
                     this.dinos[i+1] = temp;
                     listItem.parentNode.insertBefore(listItem, listItem.previousSibling)
-                    this.updateStorage();
+                    this.save();
+                    break;
                 }
-                break;
             }
         }
     },
 
     moveDown(event) {
-        const listItem = document.querySelector(`#${event.target.parentElement.id.replace('down','item')}`);
-        //Searches the dinos array for id matching id # at end of listItem's id
+        const listItem = event.target.closest('li');
+        //Searches the dinos array for id matching listItem id
         //and swaps the element with the previous in the array (down in the list)
         for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id === parseInt(listItem.id.substr(4))) {
+            if(this.dinos[i].id === parseInt(listItem.dataset.id)) {
                 if(i > 0) {
                     let temp = this.dinos[i];
                     this.dinos[i] = this.dinos[i-1];
                     this.dinos[i-1] = temp;
                     listItem.parentNode.insertBefore(listItem.nextSibling, listItem);
-                    this.updateStorage();
+                    this.save();
+                    break;
                 }
-                break;
             }
         }
     },
 
-    addDino(event) {
+    handleSubmit(event) {
+        //Create dino object
         event.preventDefault();
         const form = event.target;
         const dino = { 
@@ -181,20 +168,20 @@ const app = {
             id: this.max,
             liked: false,
         };
-       
-        form.dinoName.value = ''; //Clears textbox
 
-        //Insert into start of list and dinos array
-        this.list.insertBefore(this.renderListItem(dino), this.list.firstChild); 
+        //Add dino onto array and list
         this.dinos.push(dino);
+        this.addDino(dino);
+        form.reset();
+    },
 
-        this.addEventListeners(dino.id);
-
-        //Update names and likes string (for localStorage)
-        this.names +=  `${dino.name}&`;
-        this.likes +=  `${dino.liked}&`;
-        localStorage.setItem('names', this.names);
-        localStorage.setItem('likes', this.likes);
+    addDino(dino) {
+        //Insert into start of list and dinos array
+        const listItem = this.createListItem(dino)
+        this.list.insertBefore(listItem, this.list.firstChild); 
+       
+        //Save data in local storage
+        this.save();
         this.max++;
     },
 };
@@ -203,3 +190,11 @@ app.init({
     formSelector: '#dino-form',
     listSelector: '#dino-list',
 });
+
+/*
+    Change listItem HTML
+    Add another field to the form (era, eating habits, etc), make sure that data also persists
+    Improve CSS
+    Edit names of dinosaurs, *content editable*, 
+*/
+    

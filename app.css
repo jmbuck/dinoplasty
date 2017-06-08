@@ -37,7 +37,7 @@ li:hover {
 
 }
 
-.likes,
+.like,
 .delete,
 .up,
 .down {
@@ -48,7 +48,7 @@ li:hover {
     cursor: pointer;
 }
 
-.likes>i:hover {
+.like>i:hover {
     color: #771F1F;
 }
 
@@ -70,6 +70,7 @@ input[type=text] {
     border: 1px solid #403B50;
     box-shadow: none;
     transition-duration: 0.4s;
+    border-right-style: none;
 }
 
 input[type=text]:focus,
@@ -77,5 +78,6 @@ input[type=text]:hover {
     background: transparent;
     border: 1px solid #EDCB96;
     box-shadow: none;
+    border-right-style: none;
 }
 
