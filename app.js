@@ -12,16 +12,15 @@ const app = {
 
     load() {
         this.names = localStorage.getItem('names');
-        this.ids = localStorage.getItem('ids');
         this.likes = localStorage.getItem('likes');
         //If localStorage has data (isn't null), parse it and update list and data array
         if(this.names != null) {
             let namesArr = this.names.split('&');
-            let idsArr = this.ids.split('&');
             let likesArr = this.likes.split('&');
+            this.max = namesArr.length-1;
             for(let i = 0; i < namesArr.length-1; i++) {
                 const dino = {name: namesArr[i],
-                            id: idsArr[i],
+                            id: i,
                             liked: likesArr[i]};
                 this.dinos.push(dino);
                 this.list.insertBefore(this.renderListItem(dino), this.list.firstChild);
@@ -29,22 +28,18 @@ const app = {
             }
         } else {
             this.names = '';
-            this.ids = '';
             this.likes = '';
         }
     },
 
     updateStorage() {
         this.names = '';
-        this.ids = '';
         this.likes = '';
         for(let i = 0; i < this.dinos.length; i++) {
             this.names += `${this.dinos[i].name}&`;
-            this.ids += `${this.dinos[i].id}&`;
             this.likes += `${this.dinos[i].liked}&`;
         }
         localStorage.setItem('names', this.names);
-        localStorage.setItem('ids', this.ids);
         localStorage.setItem('likes', this.likes);
     },
 
@@ -172,18 +167,11 @@ const app = {
 
         this.addEventListeners(dino.id);
 
-        //Update names and ids string (for localStorage)
+        //Update names and likes string (for localStorage)
         this.names +=  `${dino.name}&`;
-        this.ids +=     `${dino.id}&`;
-        this.likes +=  `${dino.liked}&`
+        this.likes +=  `${dino.liked}&`;
         localStorage.setItem('names', this.names);
-        localStorage.setItem('ids', this.ids);
         localStorage.setItem('likes', this.likes);
-
-        /*
-            Add a promote/fav button 
-            Edit button
-        */
         this.max++;
     },
 };
