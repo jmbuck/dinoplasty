@@ -1,12 +1,44 @@
 const app = {
     init(selectors) {
+        
         document
             .querySelector(selectors.formSelector)
             .addEventListener('submit', this.addDino.bind(this));
         this.max = 0;
         this.list = document.querySelector(selectors.listSelector);
         this.dinos = [];
-    
+        this.load();
+    },
+
+    load() {
+        this.names = localStorage.getItem('names');
+        this.ids = localStorage.getItem('ids');
+        if(this.names != null) {
+            let namesArr = this.names.split('&');
+            let idsArr = this.ids.split('&');
+            console.log('Test: '+namesArr[namesArr.length-1]);
+            for(let i = 0; i < namesArr.length-1; i++) {
+                const dino = {name: namesArr[i],
+                            id: idsArr[i]}
+                this.dinos.push(dino);
+                this.list.insertBefore(this.renderListItem(dino), this.list.firstChild);
+                this.addEventListeners(dino.id);
+            }
+        } else {
+            this.names = '';
+            this.ids = '';
+        }
+    },
+
+    updateStorage() {
+        this.names = '';
+        this.ids = '';
+        for(let i = 0; i < this.dinos.length; i++) {
+            this.names +=  `${this.dinos[i].name}&`;
+            this.ids +=     `${this.dinos[i].id}&`;
+        }
+        localStorage.setItem('names', this.names);
+        localStorage.setItem('ids', this.ids);
     },
 
     renderListItem(dino) {
@@ -33,11 +65,11 @@ const app = {
         return item;
     },
 
-    addEventListeners() {
-        document.querySelector('#like'+this.max).addEventListener('click', this.like.bind(this));
-        document.querySelector('#del'+this.max).addEventListener('click', this.delete.bind(this));
-        document.querySelector('#up'+this.max).addEventListener('click', this.moveUp.bind(this));
-        document.querySelector('#down'+this.max).addEventListener('click', this.moveDown.bind(this));
+    addEventListeners(id) {
+        document.querySelector('#like'+id).addEventListener('click', this.like.bind(this));
+        document.querySelector('#del'+id).addEventListener('click', this.delete.bind(this));
+        document.querySelector('#up'+id).addEventListener('click', this.moveUp.bind(this));
+        document.querySelector('#down'+id).addEventListener('click', this.moveDown.bind(this));
     },
 
     like(event) {
@@ -58,6 +90,7 @@ const app = {
         for(let i = 0; i < this.dinos.length; i++) {
             if(this.dinos[i].id == listItem.id.substr(4)) {
                 this.dinos.splice(i, 1);
+                this.updateStorage();
             }
         }
         listItem.parentElement.removeChild(listItem);
@@ -71,7 +104,8 @@ const app = {
                     let temp = this.dinos[i];
                     this.dinos[i] = this.dinos[i+1];
                     this.dinos[i+1] = temp;
-                    listItem.parentNode.insertBefore(listItem, listItem.previousSibling);
+                    listItem.parentNode.insertBefore(listItem, listItem.previousSibling)
+                    this.updateStorage();
                 }
                 break;
             }
@@ -87,6 +121,7 @@ const app = {
                     this.dinos[i] = this.dinos[i-1];
                     this.dinos[i-1] = temp;
                     listItem.parentNode.insertBefore(listItem.nextSibling, listItem);
+                    this.updateStorage();
                 }
                 break;
             }
@@ -97,7 +132,7 @@ const app = {
         event.preventDefault();
         const form = event.target;
         const dino = { 
-            name: form.dinoName.value,
+            name: form.dinoName.value.trim(),
             id: this.max,
         };
         form.dinoName.value = '';
@@ -105,8 +140,11 @@ const app = {
         this.list.insertBefore(this.renderListItem(dino), this.list.firstChild); 
         this.dinos.push(dino);
 
-        this.addEventListeners();
-
+        this.addEventListeners(dino.id);
+        this.names +=  `${dino.name}&`;
+        this.ids +=     `${dino.id}&`;
+        localStorage.setItem('names', this.names);
+        localStorage.setItem('ids', this.ids);
 
         /*
             Add a promote/fav button 
