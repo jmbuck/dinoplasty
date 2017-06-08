@@ -29,7 +29,7 @@ const app = {
                 this.list.insertBefore(this.renderListItem(dino), this.list.firstChild);
                 const icon = document.querySelector(`#like${dino.id}>i`);
 
-                if(dino.liked == 'true') {
+                if(dino.liked === 'true') {
                     icon.textContent = 'favorite';
                 } 
                 this.addEventListeners(dino.id);
@@ -81,7 +81,7 @@ const app = {
         `;
 
         item.id = 'item'+dino.id;
-        if(dino.liked == 'true') {
+        if(dino.liked === 'true') {
             item.style.backgroundColor = '#EDCB96';
         }
         return item;
@@ -106,13 +106,13 @@ const app = {
         let dino;
         //Find dino in array
         for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id == listItem.id.substr(4)) {
+            if(this.dinos[i].id === parseInt(listItem.id.substr(4))) {
                 dino = this.dinos[i];
                 break;
             }
         }
         //Toggles button text and background color
-        if(icon.innerHTML == 'favorite_border') {
+        if(icon.innerHTML === 'favorite_border') {
             listItem.style.backgroundColor = '#EDCB96';
             icon.textContent = 'favorite'
             dino.liked = true;
@@ -129,10 +129,10 @@ const app = {
         const listItem = document.querySelector(`#${icon.parentElement.id.replace('del','item')}`);
         //Searches the dinos array for id matching id # at end of listItem's id
         for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id == listItem.id.substr(4)) {
+            if(this.dinos[i].id === parseInt(listItem.id.substr(4))) {
                 this.dinos.splice(i, 1);
                 this.updateStorage();
-                listItem.parentElement.removeChild(listItem);
+                listItem.remove();
             }
         }
     },
@@ -142,7 +142,7 @@ const app = {
         //Searches the dinos array for id matching id # at end of listItem's id
         //and swaps the element with the next in the array (up in the list)
         for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id == listItem.id.substr(4)) {
+            if(this.dinos[i].id === parseInt(listItem.id.substr(4))) {
                 if(i < this.dinos.length-1) {
                     let temp = this.dinos[i];
                     this.dinos[i] = this.dinos[i+1];
@@ -160,7 +160,7 @@ const app = {
         //Searches the dinos array for id matching id # at end of listItem's id
         //and swaps the element with the previous in the array (down in the list)
         for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id == listItem.id.substr(4)) {
+            if(this.dinos[i].id === parseInt(listItem.id.substr(4))) {
                 if(i > 0) {
                     let temp = this.dinos[i];
                     this.dinos[i] = this.dinos[i-1];
