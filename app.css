@@ -40,7 +40,8 @@ li:hover {
 .like,
 .delete,
 .up,
-.down {
+.down,
+.edit {
     height: 100%;
     text-align: center;
     width: 50px;
@@ -54,7 +55,8 @@ li:hover {
 
 .up>i:hover,
 .down>i:hover,
-.delete>i:hover {
+.delete>i:hover,
+.edit>i:hover {
     color: #403B50;
 }
 

@@ -36,7 +36,12 @@ const app = {
         const listItem = document.createElement('li');
         listItem.innerHTML =`
             <div class="input-group">
-                <div class="input-group-field">${dino.name}</div>
+                <div class="input-group-field name">${dino.name}</div>
+                <div class="input-group-button">
+                    <div class="edit">
+                        <i class="material-icons" style="font-size: 36px">edit</i>
+                    </div>
+                </div>
                 <div class="input-group-button">
                     <div class="like">
                         <i class="material-icons" style="font-size: 36px">favorite_border</i>
@@ -74,6 +79,7 @@ const app = {
         listItem.querySelector('.delete').addEventListener('click', this.delete.bind(this));
         listItem.querySelector('.up').addEventListener('click', this.moveUp.bind(this));
         listItem.querySelector('.down').addEventListener('click', this.moveDown.bind(this));
+        listItem.querySelector('.edit').addEventListener('mousedown', this.edit.bind(this));
         
         //hover events on delete
         listItem.querySelector('.delete').addEventListener('mouseover', function(event) {
@@ -82,6 +88,60 @@ const app = {
         listItem.querySelector('.delete').addEventListener('mouseout', function(event) {
             event.target.innerHTML = 'delete';
         });
+    },
+
+    edit(event) {
+        event.preventDefault();
+        const icon = event.target;
+        const listItem = icon.closest('li');
+        const name = listItem.querySelector('.name');
+        
+        if(icon.textContent == 'edit') {
+            //Change button icon, store original text, and focus user on textbox
+            icon.textContent = 'check'
+            this.oldName = name.textContent;
+            name.setAttribute('contenteditable', 'true');
+            name.textContent = '';
+            name.focus();
+
+            name.addEventListener('keydown', (e) => {
+                if(e.keyCode == 13) { //Enter keypress
+                    //Complete editing
+                    this.finishEditing(name, icon, true)
+                } 
+                if(e.keyCode == 27) { //Escape keypress
+                    //Cancel editing
+                    this.finishEditing(name, icon, false);
+                }
+            })
+
+            name.addEventListener('blur', (e) => {
+                //If user clicks out of textbox, cancel editing
+                if(name.getAttribute('contenteditable') === 'true') {
+                     this.finishEditing(name, icon, false);
+                }
+            })
+        } else {
+            //User clicks button to complete editing
+            this.finishEditing(name, icon, true);
+        }
+        
+    },
+
+    finishEditing(name, icon, changed) {
+        if(name.textContent === '' || !changed) name.textContent = this.oldName;
+        icon.textContent = 'edit';
+        name.setAttribute('contenteditable', 'false');
+        const listItem = icon.closest('li');
+        if(changed) {
+            for(let i = 0; i < this.dinos.length; i++) {
+                if(this.dinos[i].id === parseInt(listItem.dataset.id)) {
+                    this.dinos[i].name = name.textContent;
+                    this.save();
+                    break;
+                }
+            }
+        }
     },
 
     like(event) {
