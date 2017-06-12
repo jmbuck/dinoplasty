@@ -117,11 +117,11 @@ const app = {
             field.focus();
 
             field.addEventListener('keydown', (e) => {
-                if(e.keyCode == 13) { //Enter keypress
+                if(e.keyCode === 13 || e.keyCode === 9) { //Enter or Tab keypress
                     //Complete editing
                     this.finishEditing(field, icon, true)
                 } 
-                if(e.keyCode == 27) { //Escape keypress
+                if(e.keyCode === 27) { //Escape keypress
                     //Cancel editing
                     this.finishEditing(field, icon, false);
                 }
