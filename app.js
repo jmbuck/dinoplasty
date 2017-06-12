@@ -108,7 +108,10 @@ const app = {
         if(icon.textContent === 'edit') {
             //Change button icon, store original text, and focus user on textbox
             icon.textContent = 'check'
-            this.oldField = field.textContent;
+            if(f === 'name') 
+                this.oldName = field.textContent;
+            else
+                this.oldEra = field.textContent;
             field.setAttribute('contenteditable', 'true');
             field.textContent = '';
             field.focus();
@@ -138,7 +141,12 @@ const app = {
     },
 
     finishEditing(field, icon, changed) {
-        if(field.textContent === '' || !changed) field.textContent = this.oldField;
+        if(field.textContent === '' || !changed) {
+            if(field.classList.contains('name'))
+                field.textContent = this.oldName;
+            else 
+                field.textContent = this.oldEra;
+        } 
         icon.textContent = 'edit';
         field.setAttribute('contenteditable', 'false');
         if(changed) {
