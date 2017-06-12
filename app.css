@@ -15,11 +15,13 @@ ul {
 }
 
 li {
+    display: flex;
     border: solid 1px #403B50;
     text-align: left;
     margin-bottom: 0.3rem;
     transition-duration: 0.4s;
     font-family: Georgia, "Times New Roman", Times, serif;
+    align-items: center;
 }
 
 li:hover {
@@ -40,7 +42,6 @@ li:hover {
     height: 100%;
     text-align: center;
     width: 50px;
-    line-height: 100%;
     cursor: pointer;
 }
 
@@ -68,7 +69,6 @@ input[type=text] {
     border: 1px solid #403B50;
     box-shadow: none;
     transition-duration: 0.4s;
-
     display: inline-block;
     width: 50%;
 }
@@ -85,6 +85,7 @@ input[type=text] {
 .era {
     width: 25%;
     padding-left: 1rem;
+    flex-grow: 1;
 }
 
 input[type=text]:focus,
@@ -93,4 +94,3 @@ input[type=text]:hover {
     border: 1px solid #EDCB96;
     box-shadow: none;
 }
-

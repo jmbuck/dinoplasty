@@ -85,10 +85,8 @@ const app = {
         listItem.querySelector('.delete').addEventListener('click', this.delete.bind(this));
         listItem.querySelector('.up').addEventListener('click', this.moveUp.bind(this));
         listItem.querySelector('.down').addEventListener('click', this.moveDown.bind(this));
-        listItem.querySelector('.editName').addEventListener('mousedown', (e) => {
-                                                                this.edit(e, 'name')});
-        listItem.querySelector('.editEra').addEventListener('mousedown', (e) => {
-                                                                this.edit(e, 'era')});
+        listItem.querySelector('.editName').addEventListener('mousedown', this.edit.bind(this, 'name'));
+        listItem.querySelector('.editEra').addEventListener('mousedown', this.edit.bind(this, 'era'));
 
         //hover events on delete
         listItem.querySelector('.delete').addEventListener('mouseover', function(event) {
@@ -99,7 +97,7 @@ const app = {
         });
     },
 
-    edit(e, f) {
+    edit(f, e) {
         e.preventDefault();
         const icon = e.target;
         const listItem = icon.closest('li');
@@ -112,14 +110,14 @@ const app = {
                 this.oldName = field.textContent;
             else
                 this.oldEra = field.textContent;
-            field.setAttribute('contenteditable', 'true');
+            field.contentEditable = true;
             field.textContent = '';
             field.focus();
 
             field.addEventListener('keydown', (e) => {
                 if(e.keyCode === 13 || e.keyCode === 9) { //Enter or Tab keypress
                     //Complete editing
-                    this.finishEditing(field, icon, true)
+                    this.finishEditing(field, icon, true);
                 } 
                 if(e.keyCode === 27) { //Escape keypress
                     //Cancel editing
@@ -129,8 +127,8 @@ const app = {
 
             field.addEventListener('blur', (e) => {
                 //If user clicks out of textbox, cancel editing
-                if(field.getAttribute('contenteditable') === 'true') {
-                     this.finishEditing(field, icon, false);
+                if(field.isContentEditable) {
+                     this.finishEditing(field, icon, true);
                 }
             })
         } else {
@@ -148,7 +146,7 @@ const app = {
                 field.textContent = this.oldEra;
         } 
         icon.textContent = 'edit';
-        field.setAttribute('contenteditable', 'false');
+        field.contentEditable = false;
         if(changed) {
             const listItem = icon.closest('li');
             for(let i = 0; i < this.dinos.length; i++) {
@@ -211,7 +209,7 @@ const app = {
                     let temp = this.dinos[i];
                     this.dinos[i] = this.dinos[i+1];
                     this.dinos[i+1] = temp;
-                    listItem.parentNode.insertBefore(listItem, listItem.previousSibling)
+                    this.list.insertBefore(listItem, listItem.previousSibling)
                     this.save();
                     break;
                 }
@@ -229,7 +227,7 @@ const app = {
                     let temp = this.dinos[i];
                     this.dinos[i] = this.dinos[i-1];
                     this.dinos[i-1] = temp;
-                    listItem.parentNode.insertBefore(listItem.nextSibling, listItem);
+                    this.list.insertBefore(listItem.nextSibling, listItem);
                     this.save();
                     break;
                 }
@@ -268,12 +266,4 @@ const app = {
 app.init({
     formSelector: '#dino-form',
     listSelector: '#dino-list',
-});
-
-/*
-    Change listItem HTML
-    Add another field to the form (era, eating habits, etc), make sure that data also persists
-    Improve CSS
-    Edit names of dinosaurs, *content editable*, 
-*/
-    
+}); 
