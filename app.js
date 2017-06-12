@@ -1,12 +1,12 @@
-const app = {
-    init(selectors) {
+class App {
+    constructor(selectors) {
         document
             .querySelector(selectors.formSelector)
             .addEventListener('submit', this.handleSubmit.bind(this));
         this.max = 0;
         this.list = document.querySelector(selectors.listSelector);
         this.load();
-    },
+    }
 
     load() {       
         //If localStorage has data (isn't null), parse it and update list and data array,
@@ -25,11 +25,11 @@ const app = {
         else {
              this.dinos = [];
         }
-    },
+    }
 
     save() {
         localStorage.setItem('dinos', JSON.stringify(this.dinos))
-    },
+    }
 
     createListItem(dino) {
         //Creates list item with unique IDs for each button
@@ -77,7 +77,7 @@ const app = {
             listItem.style.backgroundColor = '#EDCB96';
         }
         return listItem;
-    },
+    }
 
     addEventListeners(listItem) {
         //click events
@@ -95,7 +95,7 @@ const app = {
         listItem.querySelector('.delete').addEventListener('mouseout', function(event) {
             event.target.innerHTML = 'delete';
         });
-    },
+    }
 
     edit(f, e) {
         e.preventDefault();
@@ -136,7 +136,7 @@ const app = {
             this.finishEditing(field, icon, true);
         }
         
-    },
+    }
 
     finishEditing(field, icon, changed) {
         if(field.textContent === '' || !changed) {
@@ -158,7 +158,7 @@ const app = {
                 }
             }
         }
-    },
+    }
 
     like(event) {
         const icon = event.target;
@@ -183,7 +183,7 @@ const app = {
             dino.liked = false;
         }
         this.save();
-    },
+    }
 
     delete(event) {
         const icon = event.target;
@@ -197,7 +197,7 @@ const app = {
                 break;
             }
         }
-    },
+    }
 
     moveUp(event) {      
         const listItem = event.target.closest('li');
@@ -215,7 +215,7 @@ const app = {
                 }
             }
         }
-    },
+    }
 
     moveDown(event) {
         const listItem = event.target.closest('li');
@@ -233,7 +233,7 @@ const app = {
                 }
             }
         }
-    },
+    }
 
     handleSubmit(event) {
         //Create dino object
@@ -250,7 +250,7 @@ const app = {
         this.dinos.push(dino);
         this.addDino(dino);
         form.reset();
-    },
+    }
 
     addDino(dino) {
         //Insert into start of list and dinos array
@@ -260,10 +260,10 @@ const app = {
         //Save data in local storage
         this.save();
         this.max++;
-    },
+    }
 };
 
-app.init({
+const app = new App({
     formSelector: '#dino-form',
     listSelector: '#dino-list',
-}); 
+});
