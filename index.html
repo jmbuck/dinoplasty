@@ -18,30 +18,30 @@
             <div class="medium-8 medium-offset-2 column">
                 <h1>Dinoplasty</h1>
                 <form id="dino-form">
-                    <div class="input-group"> 
-                        <input 
+                     <div class="row">
+                        <div class="small-5 column">
+                        <input
                             type="text"
-                            class="input-group-field" 
                             name="dinoName"
                             placeholder="Name a dinosaur"
-                            required
                             autofocus
-                        >
-
-                         <input 
-                            type="text"
-                            class="input-group-field" 
-                            name="dinoEra"
-                            placeholder="What era did it live in?"
                             required
                         >
-                  
-                        <div class="input-group-button">
+                        </div>
+                        <div class="small-4 column">
+                            <select name="dinoEra">
+                                <option value="">-- Era --</option>
+                                <option value="triassic">Triassic</option>
+                                <option value="jurassic">Jurassic</option>
+                                <option value="cretaceous">Cretaceous</option>
+                            </select>
+                        </div>
+                        <div class="small-3 column">
                             <button
-                            class="button" 
-                            type="submit"
-                            >   
-                            Add dino
+                                class="button expanded"
+                                type="submit"
+                            >
+                                Add dino
                             </button>
                         </div>
                     </div>
@@ -49,8 +49,27 @@
             </div>
         </div>
         <div class="row">
+            <div class = "small-3 column showEra">
+                <span>Show by Era:</span>
+            </div>
+            <div class = "small-4 column">
+                <select name="showEra" id="showEra">
+                    <option value="triassic">Triassic</option>
+                    <option value="jurassic">Jurassic</option>
+                    <option value="cretaceous">Cretaceous</option>
+                </select>
+            </div>
+            <div class = "small-5 column"></div>
+        </div>
+        <div class="row">
             <div class="medium-10 medium-offset-1 column">
-                <ul id="dino-list">
+                <ul id="triassic-list">
+
+                </ul>
+                <ul id="jurassic-list">
+
+                </ul>
+                <ul id="cretaceous-list">
 
                 </ul>
             </div>

@@ -1,10 +1,20 @@
+//categorize into different lists (eras)
+
 class App {
     constructor(selectors) {
         document
             .querySelector(selectors.formSelector)
             .addEventListener('submit', this.handleSubmit.bind(this));
+        document
+            .querySelector(selectors.dropDownSelector)
+            .addEventListener('change', this.changeList.bind(this));
         this.max = 0;
-        this.list = document.querySelector(selectors.listSelector);
+        this.triassic = document.querySelector(selectors.listSelector1);
+        this.jurassic = document.querySelector(selectors.listSelector2);
+        this.cretaceous = document.querySelector(selectors.listSelector3);
+        this.jurassic.style.display = 'none';
+        this.cretaceous.style.display = 'none';
+        this.currList = this.triassic;
         this.load();
     }
 
@@ -13,22 +23,70 @@ class App {
         //Reassign IDs so they remain unique
         this.dinos = JSON.parse(localStorage.getItem('dinos'));
         if(this.dinos) {
-            this.dinos.map((dino) => {
+            this.currList = this.triassic;
+            this.dinos.triassic.map((dino) => {
                 dino.id = this.max;
-                this.addDino(dino)
+                this.addDino(dino, 'triassic');
                 const icon = document.querySelector(`[data-id="${dino.id}"] .like>i`)
                 if(dino.liked === true) {
                     icon.textContent = 'favorite';
                 }
-            })
+            });
+            this.currList = this.jurassic;
+            this.dinos.jurassic.map((dino) => {
+                dino.id = this.max;
+                this.addDino(dino, 'jurassic');
+                const icon = document.querySelector(`[data-id="${dino.id}"] .like>i`)
+                if(dino.liked === true) {
+                    icon.textContent = 'favorite';
+                }
+            });
+            this.currList = this.cretaceous;
+            this.dinos.cretaceous.map((dino) => {
+                dino.id = this.max;
+                this.addDino(dino, 'cretaceous');
+                const icon = document.querySelector(`[data-id="${dino.id}"] .like>i`)
+                if(dino.liked === true) {
+                    icon.textContent = 'favorite';
+                }
+            });
         }
         else {
-             this.dinos = [];
+             this.dinos = {};
+             this.dinos.triassic = [];
+             this.dinos.jurassic = [];
+             this.dinos.cretaceous = [];
         }
+        this.currArr = this.dinos.triassic;
     }
 
     save() {
-        localStorage.setItem('dinos', JSON.stringify(this.dinos))
+        localStorage.setItem('dinos', JSON.stringify(this.dinos));
+    }
+
+    changeList(e) {
+        const era = e.target.value;
+        if(era === 'triassic') {
+            this.currList = this.triassic;
+            this.currArr = this.dinos.triassic;
+            this.jurassic.style.display = 'none';
+            this.cretaceous.style.display = 'none';
+            this.triassic.style.display = 'initial';
+        }
+        else if(era === 'jurassic') {
+            this.currList = this.jurassic;
+            this.currArr = this.dinos.jurassic;
+            this.triassic.style.display = 'none';
+            this.cretaceous.style.display = 'none';
+            this.jurassic.style.display = 'initial';
+        }
+        else {
+            this.currList = this.cretaceous;
+            this.currArr = this.dinos.cretaceous;
+            this.jurassic.style.display = 'none';
+            this.triassic.style.display = 'none';
+            this.cretaceous.style.display = 'initial';
+        }
     }
 
     createListItem(dino) {
@@ -39,12 +97,6 @@ class App {
                 <div class="input-group-field name">${dino.name}</div>
                 <div class="input-group-button">
                     <div class="editName">
-                        <i class="material-icons" style="font-size: 36px">edit</i>
-                    </div>
-                </div>
-                <div class="input-group-field era">${dino.era}</div>
-                <div class="input-group-button">
-                    <div class="editEra">
                         <i class="material-icons" style="font-size: 36px">edit</i>
                     </div>
                 </div>
@@ -85,8 +137,7 @@ class App {
         listItem.querySelector('.delete').addEventListener('click', this.delete.bind(this));
         listItem.querySelector('.up').addEventListener('click', this.moveUp.bind(this));
         listItem.querySelector('.down').addEventListener('click', this.moveDown.bind(this));
-        listItem.querySelector('.editName').addEventListener('mousedown', this.edit.bind(this, 'name'));
-        listItem.querySelector('.editEra').addEventListener('mousedown', this.edit.bind(this, 'era'));
+        listItem.querySelector('.editName').addEventListener('mousedown', this.edit.bind(this));
 
         //hover events on delete
         listItem.querySelector('.delete').addEventListener('mouseover', function(event) {
@@ -97,19 +148,16 @@ class App {
         });
     }
 
-    edit(f, e) {
+    edit(e) {
         e.preventDefault();
         const icon = e.target;
         const listItem = icon.closest('li');
-        const field = listItem.querySelector(`.${f}`);
+        const field = listItem.querySelector(`.name`);
         
         if(icon.textContent === 'edit') {
             //Change button icon, store original text, and focus user on textbox
             icon.textContent = 'check'
-            if(f === 'name') 
-                this.oldName = field.textContent;
-            else
-                this.oldEra = field.textContent;
+            this.oldName = field.textContent;
             field.contentEditable = true;
             field.textContent = '';
             field.focus();
@@ -140,19 +188,15 @@ class App {
 
     finishEditing(field, icon, changed) {
         if(field.textContent === '' || !changed) {
-            if(field.classList.contains('name'))
-                field.textContent = this.oldName;
-            else 
-                field.textContent = this.oldEra;
+            field.textContent = this.oldName;
         } 
         icon.textContent = 'edit';
         field.contentEditable = false;
         if(changed) {
             const listItem = icon.closest('li');
-            for(let i = 0; i < this.dinos.length; i++) {
-                if(this.dinos[i].id === parseInt(listItem.dataset.id)) {
-                    if(field.classList.contains('name'))  this.dinos[i].name = field.textContent;
-                    else  this.dinos[i].era = field.textContent;  
+            for(let i = 0; i < this.currArr.length; i++) {
+                if(this.currArr[i].id === parseInt(listItem.dataset.id)) {
+                    this.currArr[i].name = field.textContent; 
                     this.save();
                     break;
                 }
@@ -165,9 +209,9 @@ class App {
         const listItem = icon.closest('li');
         let dino;
         //Searches the dinos array for id matching listItem id
-        for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id === parseInt(listItem.dataset.id)) {
-                dino = this.dinos[i];
+        for(let i = 0; i < this.currArr.length; i++) {
+            if(this.currArr[i].id === parseInt(listItem.dataset.id)) {
+                dino = this.currArr[i];
                 break;
             }
         }
@@ -189,9 +233,9 @@ class App {
         const icon = event.target;
         const listItem = icon.closest('li');
         //Searches the dinos array for id matching listItem id
-        for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id === parseInt(listItem.dataset.id)) {
-                this.dinos.splice(i, 1);
+        for(let i = 0; i < this.currArr.length; i++) {
+            if(this.currArr[i].id === parseInt(listItem.dataset.id)) {
+                this.currArr.splice(i, 1);
                 this.save();
                 listItem.remove();
                 break;
@@ -203,13 +247,13 @@ class App {
         const listItem = event.target.closest('li');
         //Searches the dinos array for id matching listItem id
         //and swaps the element with the next in the array (up in the list)
-        for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id === parseInt(listItem.dataset.id)) {
-                if(i < this.dinos.length-1) {
-                    let temp = this.dinos[i];
-                    this.dinos[i] = this.dinos[i+1];
-                    this.dinos[i+1] = temp;
-                    this.list.insertBefore(listItem, listItem.previousSibling)
+        for(let i = 0; i < this.currArr.length; i++) {
+            if(this.currArr[i].id === parseInt(listItem.dataset.id)) {
+                if(i < this.currArr.length-1) {
+                    let temp = this.currArr[i];
+                    this.currArr[i] = this.currArr[i+1];
+                    this.currArr[i+1] = temp;
+                    this.currList.insertBefore(listItem, listItem.previousSibling)
                     this.save();
                     break;
                 }
@@ -221,13 +265,13 @@ class App {
         const listItem = event.target.closest('li');
         //Searches the dinos array for id matching listItem id
         //and swaps the element with the previous in the array (down in the list)
-        for(let i = 0; i < this.dinos.length; i++) {
-            if(this.dinos[i].id === parseInt(listItem.dataset.id)) {
+        for(let i = 0; i < this.currArr.length; i++) {
+            if(this.currArr[i].id === parseInt(listItem.dataset.id)) {
                 if(i > 0) {
-                    let temp = this.dinos[i];
-                    this.dinos[i] = this.dinos[i-1];
-                    this.dinos[i-1] = temp;
-                    this.list.insertBefore(listItem.nextSibling, listItem);
+                    let temp = this.currArr[i];
+                    this.currArr[i] = this.currArr[i-1];
+                    this.currArr[i-1] = temp;
+                    this.currList.insertBefore(listItem.nextSibling, listItem);
                     this.save();
                     break;
                 }
@@ -246,17 +290,25 @@ class App {
             liked: false,
         };
 
-        //Add dino onto array and list
-        this.dinos.push(dino);
-        this.addDino(dino);
-        form.reset();
+        if(dino.era) {
+             //Add dino onto array and list
+            this.dinos[dino.era].push(dino);
+            this.addDino(dino, dino.era);
+            form.reset();
+        }
     }
 
-    addDino(dino) {
+    addDino(dino, era) {
         //Insert into start of list and dinos array
         const listItem = this.createListItem(dino)
-        this.list.insertBefore(listItem, this.list.firstChild); 
-       
+        if(era === 'jurassic') {
+            this.jurassic.insertBefore(listItem, this.jurassic.firstChild); 
+        } else if(era === 'triassic') {
+            this.triassic.insertBefore(listItem, this.triassic.firstChild); 
+        } else {
+            this.cretaceous.insertBefore(listItem, this.cretaceous.firstChild); 
+        }
+        
         //Save data in local storage
         this.save();
         this.max++;
@@ -265,5 +317,8 @@ class App {
 
 const app = new App({
     formSelector: '#dino-form',
-    listSelector: '#dino-list',
+    listSelector1: '#triassic-list',
+    listSelector2: '#jurassic-list',
+    listSelector3: '#cretaceous-list',
+    dropDownSelector: '#showEra',
 });
